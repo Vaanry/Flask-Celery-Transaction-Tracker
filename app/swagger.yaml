@@ -1,0 +1,141 @@
+openapi: 3.0.0
+info:
+  title: Transaction API
+  version: 1.0.0
+paths:
+  /create_transaction/:
+    post:
+      summary: Create a new transaction
+      description: Creates a new transaction for the current user. Calculates the commission based on the user's commission rate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  description: The transaction amount.
+                  example: 100.0
+      responses:
+        '201':
+          description: Transaction successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction:
+                    type: object
+                    description: The created transaction.
+                    properties:
+                      id:
+                        type: integer
+                        description: Transaction ID.
+                      amount:
+                        type: number
+                        description: Transaction amount.
+                      commission:
+                        type: number
+                        description: Commission for the transaction.
+                      status:
+                        type: string
+                        description: Status of the transaction.
+                        example: "pending"
+                      user_id:
+                        type: integer
+                        description: ID of the user who created the transaction.
+        '403':
+          description: Forbidden. The user is not authorized.
+        '404':
+          description: User not found.
+
+  /cancel_transaction/{id}:
+    post:
+      summary: Cancel a transaction
+      description: Cancels a transaction by setting its status to "canceled". Only accessible to the user who created the transaction.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the transaction to cancel.
+          example: 1
+      responses:
+        '201':
+          description: Transaction successfully canceled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction:
+                    type: object
+                    description: The canceled transaction.
+                    properties:
+                      id:
+                        type: integer
+                        description: Transaction ID.
+                      amount:
+                        type: number
+                        description: Transaction amount.
+                      commission:
+                        type: number
+                        description: Commission for the transaction.
+                      status:
+                        type: string
+                        description: Updated status of the transaction.
+                        example: "canceled"
+                      user_id:
+                        type: integer
+                        description: ID of the user who created the transaction.
+        '403':
+          description: Forbidden. The user is not authorized.
+        '404':
+          description: Transaction or user not found.
+
+  /check_transaction/{id}:
+    get:
+      summary: Check transaction details
+      description: Retrieves the details of a transaction by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the transaction to retrieve.
+          example: 1
+      responses:
+        '200':
+          description: Transaction details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction:
+                    type: object
+                    description: The transaction details.
+                    properties:
+                      id:
+                        type: integer
+                        description: Transaction ID.
+                      amount:
+                        type: number
+                        description: Transaction amount.
+                      commission:
+                        type: number
+                        description: Commission for the transaction.
+                      status:
+                        type: string
+                        description: Status of the transaction.
+                        example: "pending"
+                      user_id:
+                        type: integer
+                        description: ID of the user who created the transaction.
+        '404':
+          description: Transaction not found.

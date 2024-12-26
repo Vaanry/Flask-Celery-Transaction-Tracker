@@ -1,0 +1,74 @@
+{% if session.get('is_admin')==True %}
+{% extends 'admin/main.html' %}
+
+{% block body %}
+
+<h1>Dashboard</h1>
+<div class="navbar-nav ms-auto d-flex align-items-center">
+    <label for="refresh-interval" class="me-2">Auto-refresh:</label>
+    <select id="refresh-interval" class="form-select form-select-sm" style="width: auto;">
+        <option value="0">Off</option>
+        <option value="10">10 seconds</option>
+        <option value="15">15 seconds</option>
+        <option value="60">1 minute</option>
+    </select>
+</div>
+<div>
+    <h2>Statistics</h2>
+    <div>
+        <p>Total Users: {{ total_users }}</p>
+        <p>Total Transactions: {{ total_transactions }}</p>
+        <p>Today's Transaction Sum: {{ total_transaction_sum }}</p>
+    </div>
+</div>
+<div>
+    <h2>Recent Transactions</h2>
+    <ul>
+        {% for transaction in recent_transactions %}
+            <li>
+                ID: {{ transaction.id }}, Amount: {{ transaction.amount }},
+                Status: {{ transaction.status }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+<script>
+    let refreshInterval = 0;
+    let refreshTimer = null;
+
+    document.getElementById('refresh-interval').addEventListener('change', (e) => {
+        refreshInterval = parseInt(e.target.value, 10);
+
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
+
+        if (refreshInterval > 0) {
+            refreshTimer = setInterval(() => {
+                const contentArea = document.getElementById('content-area');
+                fetch(window.location.href, { cache: 'no-cache' })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContent = doc.getElementById('content-area').innerHTML;
+                        contentArea.innerHTML = newContent;
+                    })
+                    .catch(error => console.error('Error refreshing content:', error));
+            }, refreshInterval * 1000);
+        }
+    });
+</script>
+{% endblock %}
+{% else %}
+
+{% extends "main.html" %}
+{% block crud_container %}
+<section class="jumbotron text-center mt-4" style="background: url({{ url_for('static', filename = 'images/forbidden.jpg') }}); background-position: center center">
+    <h1 class="display-4">Доступ запрещён</h1>
+  </section>
+{% endblock %}
+{% endif %}

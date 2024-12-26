@@ -1,0 +1,49 @@
+{% extends 'admin/master.html' %}
+
+{% block navbar %}
+{{ super() }}
+<div class="navbar-nav ms-auto d-flex align-items-center">
+    <label for="refresh-interval" class="me-2">Auto-refresh:</label>
+    <select id="refresh-interval" class="form-select form-select-sm" style="width: auto;">
+        <option value="0">Off</option>
+        <option value="10">10 seconds</option>
+        <option value="15">15 seconds</option>
+        <option value="60">1 minute</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block body %}
+<div id="content-area">
+    {{ super() }}
+</div>
+
+<script>
+    let refreshInterval = 0;
+    let refreshTimer = null;
+
+    document.getElementById('refresh-interval').addEventListener('change', (e) => {
+        refreshInterval = parseInt(e.target.value, 10);
+
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
+
+        if (refreshInterval > 0) {
+            refreshTimer = setInterval(() => {
+                const contentArea = document.getElementById('content-area');
+                fetch(window.location.href, { cache: 'no-cache' })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContent = doc.getElementById('content-area').innerHTML;
+                        contentArea.innerHTML = newContent;
+                    })
+                    .catch(error => console.error('Error refreshing content:', error));
+            }, refreshInterval * 1000);
+        }
+    });
+</script>
+{% endblock %}
