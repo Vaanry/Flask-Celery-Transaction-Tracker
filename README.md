@@ -88,7 +88,7 @@ project/
 ## Основные команды
 
 - **Запуск Flask**: `flask run`
-- **Создание дефолтного админа: `create-admin`
+- Создание дефолтного админа: `flask create-admin`
 - **Запуск Celery worker**: `celery -A app.celery.celery_app worker --loglevel=info`
 - **Запуск Celery beat**: `celery -A app.celery_beat beat --loglevel=info`
 
