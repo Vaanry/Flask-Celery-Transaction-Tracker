@@ -24,7 +24,7 @@ Flask-Celery Transaction Tracker — это приложение для отсл
 
 1. Клонируйте репозиторий:
     ```bash
-    git clone git@github.com:Vaanry/Flask_celery_test_task.git
+    git clone git@github.com:Vaanry/Flask-Celery-Transaction-Tracker.git
     cd Flask_celery_test_task
     ```
 
